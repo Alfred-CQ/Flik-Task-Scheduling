@@ -1,10 +1,5 @@
-/* Main Program */
-#include <iostream>
+#include "flik.h"
 
-using namespace std;
-
-int main()
-{
-
-    return 0;
-}
+Flick::Flick(const std::vector<VMachine> &vms,
+             const std::vector<Task> &tasks)
+    : vms(vms), tasks(tasks) {}

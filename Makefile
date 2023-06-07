@@ -16,7 +16,7 @@ BIN_DIR     = ./bin
 INCLUDE_DIR	=. ./include
 
 # CPP, Sources, Dependencies and Object files
-CPP_LIST_FLIK = flik.cpp
+CPP_LIST_FLIK = main.cpp flik.cpp vmachine.cpp task.cpp
 SRC_LIST_FLIK = $(patsubst %.cpp,$(SRC_DIR)/%.cpp,$(CPP_LIST_FLIK))
 OBJ_LIST_FLIK = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRC_LIST_FLIK))
 DEP_LIST_FLIK = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.d,$(SRC_LIST_FLIK))
