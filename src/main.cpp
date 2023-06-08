@@ -1,11 +1,15 @@
 #include <flik.h>
 
+#define N 100
+#define Y 5
+#define TG (N / Y)
+
 int main()
 {
-    std::vector<VMachine> vmachines = load_VMachines("dataset/VMachine_Flik.csv");
-    std::vector<Task> tasks = load_Tasks("dataset/Task_Flik.csv");
+    VMS vmachines = load_VMachines("dataset/VMachine_Flik.csv");
+    TASKS tasks = load_Tasks("dataset/Task_Flik.csv");
 
-    Flick flick(vmachines, tasks);
+    Flik flik(vmachines, tasks, Y);
 
     return 0;
 }

@@ -5,16 +5,28 @@
 
 #include <environment.h>
 
-class Flick
+class Flik
 {
 public:
-    Flick(const std::vector<VMachine> &vms, const std::vector<Task> &tasks);
+    Flik(const VMS &vms, const TASKS &tasks, int num_groups);
 
     // Methods
+    // Core
+    void encoder();
+
+    // GA
+    void make_Chromosomes();
+
+    // Getters
 
 private:
-    std::vector<VMachine> vms;
-    std::vector<Task> tasks;
+    VMS vms;
+    TASKS tasks;
+
+    CONTAINER container;
+    std::vector<CHROMOSOME> chromosomes;
+
+    int num_groups;
 };
 
 #endif // !__FLIK__
