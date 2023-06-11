@@ -7,7 +7,7 @@ int main()
 
     Flik flik(vmachines, tasks, Y);
 
-    flik.colony_Launch(2);
+    flik.colony_Launch(100);
 
     return 0;
 }

@@ -15,12 +15,12 @@ void Flik::colony_Launch(int numb_epochs)
 {
     encoder();
     print_Population(population);
-
+    int iterations, count_crossover, count_mutations;
     for (int idx = 0; idx < population.size(); ++idx)
     {
         std::cout << " ***************" << idx << "***************\n";
 
-        int iterations = 0;
+        iterations = count_crossover = count_mutations = 0;
         while (iterations < numb_epochs)
         {
             fitness();
@@ -34,14 +34,23 @@ void Flik::colony_Launch(int numb_epochs)
             float mut_rate = dist(generator);
 
             if (cross_rate < CROSSOVER_RATE)
+            {
                 crossover();
+                count_crossover++;
+            }
 
             if (mut_rate < MUTATION_RATE)
+            {
                 mutation();
-
+                count_mutations++;
+            }
             iterations++;
         }
+        std::cout << "[ CROSSOVERS ]: " << count_crossover << "  "
+                  << "[ MUTATIONS ]: " << count_mutations << "\n";
     }
+
+    print_Population(population);
 }
 
 void Flik::encoder()
@@ -74,6 +83,7 @@ void Flik::selection()
     for (int i = 1; i < circular_disk.size(); ++i)
         circular_disk[i] = circular_disk[i - 1] + (fit_vals[i] / sum_fitness);
 
+    /*
     std::cout << "No.  |  Task ID  | Machine ID \n"
               << "------------------------------\n";
 
@@ -83,7 +93,7 @@ void Flik::selection()
                   << std::setw(9) << fit_vals[i] << " | "
                   << std::setw(9) << circular_disk[i] << " | \n";
     }
-
+    */
     int numb_survivors = Y * SELECTION_RATE;
 
     for (int i = 0; i < numb_survivors; ++i)
@@ -91,10 +101,43 @@ void Flik::selection()
 }
 void Flik::crossover()
 {
+    std::random_device seed;
+    std::mt19937 generator(seed());
+    std::uniform_real_distribution<> dis(0, TG - 2);
+
+    int numb_survivors = Y * SELECTION_RATE;
+
+    for (int i = 0; i < numb_survivors; i += 2)
+    {
+        int cutPoint1 = dis(generator);
+
+        std::swap((*survivors[i])[cutPoint1], (*survivors[i + 1])[cutPoint1 + 1]);
+    }
 }
 
 void Flik::mutation()
 {
+    int numb_survivors = Y * SELECTION_RATE;
+
+    for (int i = 0; i < numb_survivors; ++i)
+    {
+        std::random_device seed;
+        std::mt19937 generator(seed());
+        std::uniform_real_distribution<> dis(0, TG - 1);
+
+        int start = dis(generator);
+        int end = dis(generator);
+
+        if (start > end)
+            std::swap(start, end);
+
+        while (start < end)
+        {
+            std::swap((*survivors[i])[start]->second, (*survivors[i])[end]->second);
+            start++;
+            end--;
+        }
+    }
 }
 
 void Flik::shuffle_Tasks()
