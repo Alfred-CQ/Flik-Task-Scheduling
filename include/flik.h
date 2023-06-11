@@ -24,6 +24,8 @@ public:
     // GA
     void shuffle_Tasks();
     void make_Population();
+
+    CHROMOSOME *roulette(std::vector<float> circular_disk);
     // Getters
 
 private:
@@ -31,6 +33,10 @@ private:
     TASKS tasks;
 
     POPULATION population;
+    POPULATION survivors;
+
+    FITNESS_VALUES fit_vals;
+    float sum_fitness;
 
     int num_groups;
 };

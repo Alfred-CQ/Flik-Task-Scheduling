@@ -12,6 +12,7 @@
 #define Y 10
 #define TG (N / Y)
 
+#define SELECTION_RATE 0.6
 #define CROSSOVER_RATE 0.6
 #define MUTATION_RATE 0.4
 
@@ -21,6 +22,8 @@ typedef std::vector<VMachine> VMS;
 typedef std::pair<Task *, VMachine *> GENOME;
 typedef std::vector<GENOME *> CHROMOSOME;
 typedef std::vector<CHROMOSOME *> POPULATION;
+
+typedef std::vector<float> FITNESS_VALUES;
 
 static VMS load_VMachines(const std::string &filename)
 {
@@ -100,7 +103,7 @@ static TASKS load_Tasks(const std::string &filename)
 
 static float get_RunningTime(const GENOME &genome)
 {
-    return ((genome.first)->get_MIPS() / (genome.second)->get_ComputeUnit() / 10);
+    return ((genome.first)->get_MIPS() / (genome.second)->get_ComputeUnit() / 5);
 }
 
 static void print_Population(const POPULATION &population)
