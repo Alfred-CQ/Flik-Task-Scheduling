@@ -8,8 +8,8 @@ class VMachine
 {
 public:
     // Constructor
-    VMachine(const std::string &vm_Id,
-             const std::string &processor_Name,
+    VMachine(std::string vm_Id,
+             std::string processor_Name,
              int mips, float clock_Frequency,
              int bandwidth,
              int ram,

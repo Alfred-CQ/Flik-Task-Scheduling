@@ -4,34 +4,92 @@ Flik::Flik(const VMS &vms,
            const TASKS &tasks, int num_groups)
     : vms(vms), tasks(tasks), num_groups(num_groups)
 {
+}
+
+void Flik::colony_Launch(int numb_epochs)
+{
     encoder();
+    print_Population(population);
+
+    for (int idx = 0; idx < population.size(); ++idx)
+    {
+        std::cout << " ***************" << idx << "***************\n";
+
+        int iterations = 0;
+        while (iterations < numb_epochs)
+        {
+            fitness();
+            selection();
+
+            std::random_device seed;
+            std::mt19937 generator(seed());
+            std::uniform_int_distribution<size_t> dist(0.0, 1.0);
+
+            float cross_rate = dist(generator);
+            float mut_rate = dist(generator);
+
+            if (cross_rate < CROSSOVER_RATE)
+                crossover();
+
+            if (mut_rate < MUTATION_RATE)
+                mutation();
+
+            iterations++;
+        }
+    }
 }
 
 void Flik::encoder()
 {
-    container = get_Container(num_groups, tasks);
-    make_Chromosomes();
-    print_Chromosomes(chromosomes);
+    shuffle_Tasks();
+    make_Population();
 }
 
-void Flik::make_Chromosomes()
+void Flik::fitness()
 {
-    std::random_device rd;
-    std::mt19937 gen(rd());
+}
 
-    for (const TASKS &group : container)
+void Flik::selection()
+{
+}
+
+void Flik::crossover()
+{
+}
+
+void Flik::mutation()
+{
+}
+
+void Flik::shuffle_Tasks()
+{
+    std::random_device seed;
+    std::mt19937 generator(seed());
+    std::shuffle(tasks.begin(), tasks.end(), generator);
+}
+
+void Flik::make_Population()
+{
+    std::random_device seed;
+    std::mt19937 generator(seed());
+    std::uniform_int_distribution<size_t> dist(0, vms.size() - 1);
+
+    int i{0}, j{0}, idx_task{0};
+    for (i = 0; i < Y; ++i)
     {
-        CHROMOSOME chromosome;
+        CHROMOSOME *chromosome = new CHROMOSOME;
 
-        for (const Task &task : group)
+        for (j = 0; j < TG; ++j)
         {
-            std::uniform_int_distribution<size_t> dist(0, vms.size() - 1);
-            size_t vmIndex = dist(gen);
-
-            GENOME genome(vms[vmIndex], task);
-            chromosome.push_back(genome);
+            GENOME *genome = new GENOME(&tasks[idx_task], &vms[dist(generator)]);
+            chromosome->push_back(genome);
+            idx_task++;
         }
 
-        chromosomes.push_back(chromosome);
+        population.push_back(chromosome);
     }
+
+    std::cout << "\nN[ VAL ]: " << tasks.size() << " vs N[ PARAM ]: " << N
+              << "\nY[ VAL ]: " << population.size() << " vs Y[ PARAM ]: " << Y
+              << "\nTG[ VAL ]: " << population[0]->size() << " vs TG[ PARAM ]: " << TG << "\n";
 }

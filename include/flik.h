@@ -11,20 +11,26 @@ public:
     Flik(const VMS &vms, const TASKS &tasks, int num_groups);
 
     // Methods
-    // Core
+    // Main
+    void colony_Launch(int numb_epochs);
+
+    // HAGA
     void encoder();
+    void fitness();
+    void selection();
+    void crossover();
+    void mutation();
 
     // GA
-    void make_Chromosomes();
-
+    void shuffle_Tasks();
+    void make_Population();
     // Getters
 
 private:
     VMS vms;
     TASKS tasks;
 
-    CONTAINER container;
-    std::vector<CHROMOSOME> chromosomes;
+    POPULATION population;
 
     int num_groups;
 };

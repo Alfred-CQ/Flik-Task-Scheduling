@@ -1,3 +1,4 @@
+Virtual Machine Id,Nombre del procesador,MIPS del procesador,Frecuencia del reloj (GHz),Bandwith (Mbps),RAM (GB),Storage (GB),CU
 VM001,Intel Core i7-8700,20000,3.2,1000,16,500,64
 VM002,AMD Ryzen 5 3600,18000,3.6,800,8,250,64.8
 VM003,Intel Xeon E5-2670,25000,2.6,1200,32,1000,65

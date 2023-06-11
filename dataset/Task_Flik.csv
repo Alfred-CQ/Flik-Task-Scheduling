@@ -1,3 +1,4 @@
+Task_Id,MIPS,RAM,Bandwidth,Duration
 Task1,2400,4,100,7.5
 Task2,1800,8,50,6
 Task3,2000,2,80,9

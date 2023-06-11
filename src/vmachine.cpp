@@ -1,8 +1,8 @@
 #include "vmachine.h"
 
 // Constructor
-VMachine::VMachine(const std::string &vm_Id,
-                   const std::string &processor_Name,
+VMachine::VMachine(std::string vm_Id,
+                   std::string processor_Name,
                    int mips, float clock_Frequency,
                    int bandwidth, int ram, int storage, float compute_Unit)
     : virtual_MachineId(vm_Id),

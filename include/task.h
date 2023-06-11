@@ -6,7 +6,7 @@
 class Task
 {
 public:
-    Task(const std::string &task_Id,
+    Task(std::string task_Id,
          int mips,
          int ram,
          int bandwidth,
