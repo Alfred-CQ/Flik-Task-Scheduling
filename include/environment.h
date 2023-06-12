@@ -155,3 +155,24 @@ static void print_Population(const POPULATION &population)
         totalMachineMIPS = totalTaskMIPS = totalEstimatedTime = totalRealTime = 0;
     }
 }
+
+static void print_VMachines(const VMS &vms)
+{
+    std::cout << "Virtual Machine ID |    Processor Name    | Pheromone | Status\n";
+    std::cout << "----------------------------------------------------------------\n";
+
+    for (const VMachine vmachine : vms)
+    {
+        std::cout << std::setw(18) << vmachine.get_VirtualMachineId() << " | "
+                  << std::setw(20) << vmachine.get_ProcessorName() << " | "
+                  << std::setw(9) << vmachine.pheromone << " | "
+                  << (vmachine.status ? "Active" : "Inactive") << '\n';
+    }
+
+    std::cout << "-----------------------------------------------------\n";
+}
+
+static bool compareGenomeByPheromone(GENOME *genome1, GENOME *genome2)
+{
+    return genome1->second->pheromone > genome2->second->pheromone;
+}

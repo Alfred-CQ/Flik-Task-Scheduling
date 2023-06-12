@@ -16,6 +16,9 @@ public:
              int storage,
              float compute_Unit);
 
+    float pheromone = 0.0;
+    bool status = false;
+
     // Getters
     std::string get_VirtualMachineId() const;
     std::string get_ProcessorName() const;

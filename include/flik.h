@@ -38,6 +38,9 @@ private:
     FITNESS_VALUES fit_vals;
     float sum_fitness;
 
+    float sum_pheromone;
+    std::vector<float> group_pheromones;
+
     int num_groups;
 };
 

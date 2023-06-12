@@ -4,25 +4,51 @@ Flik::Flik(const VMS &vms,
            const TASKS &tasks, int num_groups)
     : vms(vms), tasks(tasks), num_groups(num_groups)
 {
+    sum_pheromone = 1.0;
+
     for (int i = 0; i < Y; ++i)
     {
         fit_vals.push_back(0.0);
         survivors.push_back(nullptr);
+        group_pheromones.push_back(1.0);
     }
 }
 
 void Flik::colony_Launch(int numb_epochs)
 {
+    print_VMachines(vms);
+
     encoder();
     print_Population(population);
+
     int iterations, count_crossover, count_mutations;
     for (int idx = 0; idx < population.size(); ++idx)
     {
         std::cout << " ***************" << idx << "***************\n";
 
         iterations = count_crossover = count_mutations = 0;
+
+        if (idx > 0)
+        {
+            int i = 0;
+            VMachine *unique = (*population[0])[0]->second;
+            for (const CHROMOSOME *chromosome : population)
+            {
+                for (const GENOME *genome : *chromosome)
+                {
+                    if (genome->second != unique)
+                    {
+                        genome->second->pheromone -= (genome->second->pheromone / group_pheromones[i]);
+                        unique = genome->second;
+                    }
+                }
+                ++i;
+            }
+        }
+
         while (iterations < numb_epochs)
         {
+
             fitness();
             selection();
 
@@ -46,10 +72,36 @@ void Flik::colony_Launch(int numb_epochs)
             }
             iterations++;
         }
+
+        for (CHROMOSOME *chromosome : population)
+            std::sort(chromosome->begin(), chromosome->end(), compareGenomeByPheromone);
+
+        int i = 0;
+
+        for (const CHROMOSOME *chromosome : population)
+        {
+            // float group_pheromone = 0.0;
+            VMachine *unique = (*chromosome)[0]->second;
+            sum_pheromone = unique->pheromone;
+            for (const GENOME *genome : *chromosome)
+            {
+                if (genome->second != unique)
+                {
+                    sum_pheromone += genome->second->pheromone;
+                    unique = genome->second;
+                }
+                genome->second->pheromone += get_RunningTime(*genome);
+            }
+            group_pheromones[i] = sum_pheromone;
+            ++i;
+        }
+
         std::cout << "[ CROSSOVERS ]: " << count_crossover << "  "
-                  << "[ MUTATIONS ]: " << count_mutations << "\n";
+                  << "[ MUTATIONS ]: " << count_mutations << " "
+                  << "[ GLOBAL_P ]: " << sum_pheromone << "\n";
     }
 
+    print_VMachines(vms);
     print_Population(population);
 }
 
@@ -66,9 +118,15 @@ void Flik::fitness()
     for (int i = 0; i < population.size(); ++i)
     {
         float realTime = 0.0;
+        float overload = 0.0;
 
         for (const GENOME *genome : (*population[i]))
+        {
+            overload += (*genome).second->pheromone;
             realTime += get_RunningTime(*genome);
+        }
+
+        realTime -= (((overload / group_pheromones[i]) / realTime));
 
         sum_fitness += realTime;
         fit_vals[i] = realTime;
@@ -82,23 +140,23 @@ void Flik::selection()
 
     for (int i = 1; i < circular_disk.size(); ++i)
         circular_disk[i] = circular_disk[i - 1] + (fit_vals[i] / sum_fitness);
-
     /*
-    std::cout << "No.  |  Task ID  | Machine ID \n"
-              << "------------------------------\n";
+        std::cout << "No.  |  Fit_Val  |    Fi \n"
+                  << "------------------------------\n";
 
-    for (int i = 0; i < fit_vals.size(); ++i)
-    {
-        std::cout << std::setw(4) << i + 1 << " | "
-                  << std::setw(9) << fit_vals[i] << " | "
-                  << std::setw(9) << circular_disk[i] << " | \n";
-    }
+        for (int i = 0; i < fit_vals.size(); ++i)
+        {
+            std::cout << std::setw(4) << i + 1 << " | "
+                      << std::setw(9) << fit_vals[i] << " | "
+                      << std::setw(9) << circular_disk[i] << " | \n";
+        }
     */
     int numb_survivors = Y * SELECTION_RATE;
 
     for (int i = 0; i < numb_survivors; ++i)
         survivors[i] = roulette(circular_disk);
 }
+
 void Flik::crossover()
 {
     std::random_device seed;
@@ -160,8 +218,11 @@ void Flik::make_Population()
 
         for (j = 0; j < TG; ++j)
         {
-            GENOME *genome = new GENOME(&tasks[idx_task], &vms[dist(generator)]);
+            int vmIndex = dist(generator);
+            GENOME *genome = new GENOME(&tasks[idx_task], &vms[vmIndex]);
             chromosome->push_back(genome);
+
+            vms[vmIndex].status = true;
             idx_task++;
         }
 
@@ -177,7 +238,7 @@ CHROMOSOME *Flik::roulette(std::vector<float> circular_disk)
 {
     std::random_device seed;
     std::mt19937 generator(seed());
-    std::uniform_real_distribution<> dis(0.0, 1.0);
+    std::uniform_real_distribution<> dis(0.0, sum_fitness);
 
     CHROMOSOME *selected_chromosome = nullptr;
 
@@ -190,6 +251,7 @@ CHROMOSOME *Flik::roulette(std::vector<float> circular_disk)
             if (random_num1 <= circular_disk[i] && selected_chromosome == nullptr)
                 selected_chromosome = population[i];
         }
+
     } while (selected_chromosome == nullptr);
 
     return selected_chromosome;
