@@ -38,7 +38,7 @@ void Flik::colony_Launch(int numb_epochs)
                 {
                     if (genome->second != unique)
                     {
-                        genome->second->pheromone -= (genome->second->pheromone / group_pheromones[i]);
+                        genome->second->pheromone -= (genome->second->pheromone / TG);
                         unique = genome->second;
                     }
                 }
