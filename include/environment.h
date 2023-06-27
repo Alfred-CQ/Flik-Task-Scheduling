@@ -8,8 +8,8 @@
 #include "vmachine.h"
 #include "task.h"
 
-#define N 100
-#define Y 10
+#define N 128
+#define Y 8
 #define TG (N / Y)
 
 #define SELECTION_RATE 0.6
@@ -103,7 +103,7 @@ static TASKS load_Tasks(const std::string &filename)
 
 static float get_RunningTime(const GENOME &genome)
 {
-    return ((genome.first)->get_MIPS() / (genome.second)->get_ComputeUnit() / 5);
+    return ((genome.first)->get_MIPS() / (genome.second)->get_ComputeUnit());
 }
 
 static void print_Population(const POPULATION &population)

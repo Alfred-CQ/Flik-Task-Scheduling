@@ -26,6 +26,7 @@ public:
     void make_Population();
 
     CHROMOSOME *roulette(std::vector<float> circular_disk);
+    void fisherYates(CHROMOSOME *&incomplete);
     // Getters
 
 private:

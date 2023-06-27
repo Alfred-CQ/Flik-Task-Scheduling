@@ -16,9 +16,11 @@ Flik::Flik(const VMS &vms,
 
 void Flik::colony_Launch(int numb_epochs)
 {
-    print_VMachines(vms);
+    std::cout << "Flik Task Scheduling [ Launch ] \n";
 
     encoder();
+
+    print_VMachines(vms);
     print_Population(population);
 
     int iterations, count_crossover, count_mutations;
@@ -48,8 +50,8 @@ void Flik::colony_Launch(int numb_epochs)
 
         while (iterations < numb_epochs)
         {
-
             fitness();
+
             selection();
 
             std::random_device seed;
@@ -211,13 +213,34 @@ void Flik::make_Population()
     std::mt19937 generator(seed());
     std::uniform_int_distribution<size_t> dist(0, vms.size() - 1);
 
-    int i{0}, j{0}, idx_task{0};
-    for (i = 0; i < Y; ++i)
+    int i{0}, j{0}, idx_task{vms.size() - 1};
+
+    CHROMOSOME *chromosome = nullptr;
+
+    fisherYates(chromosome);
+
+    for (i = chromosome->size(); i < TG; ++i)
     {
-        CHROMOSOME *chromosome = new CHROMOSOME;
+        std::cout << idx_task << "\n";
+        int vmIndex = dist(generator);
+        GENOME *genome = new GENOME(&tasks[idx_task], &vms[vmIndex]);
+        chromosome->push_back(genome);
+
+        vms[vmIndex].status = true;
+        idx_task++;
+    }
+
+    population.push_back(chromosome);
+
+    int remaining_groups{Y - population.size()};
+
+    for (i = 0; i < remaining_groups; ++i)
+    {
+        chromosome = new CHROMOSOME;
 
         for (j = 0; j < TG; ++j)
         {
+            std::cout << idx_task << "\n";
             int vmIndex = dist(generator);
             GENOME *genome = new GENOME(&tasks[idx_task], &vms[vmIndex]);
             chromosome->push_back(genome);
@@ -229,9 +252,47 @@ void Flik::make_Population()
         population.push_back(chromosome);
     }
 
-    std::cout << "\nN[ VAL ]: " << tasks.size() << " vs N[ PARAM ]: " << N
-              << "\nY[ VAL ]: " << population.size() << " vs Y[ PARAM ]: " << Y
-              << "\nTG[ VAL ]: " << population[0]->size() << " vs TG[ PARAM ]: " << TG << "\n";
+    std::cout << "\nN [ VAL ]: " << tasks.size() << " vs N [ PARAM ]: " << N
+              << "\nY [ VAL ]: " << population.size() << " vs Y [ PARAM ]: " << Y
+              << "\nTG [ VAL ]: " << population[population.size() - 1]->size() << " vs TG [ PARAM ]: " << TG
+              << "\nVMS available: " << vms.size() << "\n";
+}
+
+void Flik::fisherYates(CHROMOSOME *&incomplete)
+{
+    srand(time(NULL));
+
+    int i, idx_task{0}, n{vms.size()}, tg_counter{1};
+
+    CHROMOSOME *chromosome = new CHROMOSOME;
+
+    for (i = n - 1; i > -1; --i)
+    {
+        int vmIndex = rand() % (i + 1);
+
+        if (tg_counter % (TG + 1))
+        {
+            GENOME *genome = new GENOME(&tasks[idx_task], &vms[vmIndex]);
+            chromosome->push_back(genome);
+            idx_task++;
+        }
+        else
+        {
+            tg_counter = 1;
+            population.push_back(chromosome);
+            chromosome = new CHROMOSOME;
+        }
+
+        vms[vmIndex].status = true;
+        std::swap(vms[i], vms[vmIndex]);
+
+        tg_counter++;
+    }
+
+    incomplete = chromosome;
+
+    std::cout << "[ FY ] Last Chromosome Size: " << chromosome->size() << "\n";
+    std::cout << "[ FY ] Population Size: " << population.size() << "\n";
 }
 
 CHROMOSOME *Flik::roulette(std::vector<float> circular_disk)
